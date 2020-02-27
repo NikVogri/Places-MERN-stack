@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../../shared/context/auth-context";
 
 import Map from "../../shared/components/UIElements/Map.component";
 import Modal from "../../shared/components/UIElements/Modal.component";
@@ -15,10 +16,24 @@ const PlaceItem = ({
   creatorId,
   address
 }) => {
+  const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const openMapHandler = () => setShowMap(true);
   const closeMapHandler = () => setShowMap(false);
+
+  const showDeleteHandler = () => {
+    setShowConfirmModal(true);
+  };
+
+  const cancelDeleteHandler = () => {
+    setShowConfirmModal(false);
+  };
+
+  const confirmDeleteHandler = () => {
+    console.log("deleting");
+  };
 
   return (
     <>
@@ -34,6 +49,27 @@ const PlaceItem = ({
           <Map center={coordinates} zoom={16} />
         </div>
       </Modal>
+      <Modal
+        header="Are you sure?"
+        footerClass="place-item__modal-actions"
+        show={showConfirmModal}
+        onCancel={cancelDeleteHandler}
+        footer={
+          <>
+            <Button inverse onClick={confirmDeleteHandler}>
+              Delete
+            </Button>
+            <Button danger onClick={cancelDeleteHandler}>
+              Cancel
+            </Button>
+          </>
+        }
+      >
+        <p>
+          Do you want to proceed and delete this place? Please not that it can't
+          be undone thereafter.
+        </p>
+      </Modal>
       <li>
         <Card className="place-item__content">
           <div className="place-item__image">
@@ -48,8 +84,14 @@ const PlaceItem = ({
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            <Button to={`/places/${id}`}>EDIT</Button>
-            <Button danger>DELETE</Button>
+            {auth.isLoggedIn && (
+              <>
+                <Button to={`/places/${id}`}>EDIT</Button>
+                <Button danger onClick={showDeleteHandler}>
+                  DELETE
+                </Button>
+              </>
+            )}
           </div>
         </Card>
       </li>
