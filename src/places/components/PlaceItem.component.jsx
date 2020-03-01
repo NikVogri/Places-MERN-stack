@@ -34,7 +34,6 @@ const PlaceItem = ({
   const confirmDeleteHandler = () => {
     console.log("deleting");
   };
-
   return (
     <>
       <Modal

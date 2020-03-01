@@ -16,11 +16,11 @@ const UsersList = ({ items }) => {
     <ul className="users-list">
       {items.map(item => (
         <UserItem
-          key={item.id}
-          id={item.id}
+          key={item._id}
+          id={item._id}
           image={item.image}
           name={item.name}
-          placeCount={item.places}
+          placeCount={item.places.length}
         />
       ))}
     </ul>

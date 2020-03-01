@@ -16,6 +16,7 @@ const PlaceList = ({ items }) => {
       </div>
     );
   }
+
   return (
     <ul className="place-list">
       {items.map(item => (
