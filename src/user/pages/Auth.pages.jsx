@@ -7,6 +7,7 @@ import {
 } from "../../shared/Util/validators";
 import { AuthContext } from "../../shared/context/auth-context";
 
+import ImageUpload from "../../shared/components/FormElements/ImageUpload.component";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal.component";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.component";
 import Card from "../../shared/components/UIElements/Card.component";
@@ -55,17 +56,16 @@ const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value
-          }),
-          {
-            "Content-Type": "application/json"
-          }
+          formData
         );
         auth.login(responseData.user.id);
       } catch (err) {}
@@ -88,6 +88,10 @@ const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false
+          },
+          image: {
+            value: null,
             isValid: false
           }
         },
@@ -116,6 +120,9 @@ const Auth = () => {
               errorText="Please enter a name"
               onInput={inputHandler}
             />
+          )}
+          {!showLogin && (
+            <ImageUpload center id="image" onInput={inputHandler} />
           )}
           <Input
             id="email"
