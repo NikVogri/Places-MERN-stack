@@ -2,7 +2,8 @@ import React, { useState, useContext } from "react";
 import { useForm } from "../../shared/hooks/form-hook";
 import {
   VALIDATOR_EMAIL,
-  VALIDATOR_REQUIRE
+  VALIDATOR_REQUIRE,
+  VALIDATOR_MINLENGTH
 } from "../../shared/Util/validators";
 import { AuthContext } from "../../shared/context/auth-context";
 
@@ -39,7 +40,7 @@ const Auth = () => {
     event.preventDefault();
     if (showLogin) {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -50,11 +51,11 @@ const Auth = () => {
             "Content-Type": "application/json"
           }
         );
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {}
     } else {
       try {
-        await sendRequest(
+        const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
           JSON.stringify({
@@ -66,7 +67,7 @@ const Auth = () => {
             "Content-Type": "application/json"
           }
         );
-        auth.login();
+        auth.login(responseData.user.id);
       } catch (err) {}
     }
   };
@@ -130,7 +131,7 @@ const Auth = () => {
             element="input"
             type="password"
             label="Password"
-            validators={[VALIDATOR_REQUIRE()]}
+            validators={[VALIDATOR_MINLENGTH(6)]}
             errorText="Please enter a valid password"
             onInput={inputHandler}
           />

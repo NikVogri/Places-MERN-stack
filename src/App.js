@@ -16,14 +16,16 @@ import UserPlaces from "./places/pages/UserPlaces.pages";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [userId, setUserId] = useState(null);
   // never be recreated to avoid infinite callbacks
-  const login = useCallback(() => {
+  const login = useCallback(uid => {
     setIsLoggedIn(true);
+    setUserId(uid);
   }, []);
 
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setUserId(null);
   }, []);
 
   let routes;
@@ -64,7 +66,7 @@ function App() {
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout, userId }}>
       <Router>
         <MainNav />
         <main>{routes}</main>

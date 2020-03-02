@@ -1,6 +1,9 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../../shared/context/auth-context";
+import { useHttpClient } from "../../shared/hooks/http-hook";
 
+import ErrorModal from "../../shared/components/UIElements/ErrorModal.component";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.component";
 import Map from "../../shared/components/UIElements/Map.component";
 import Modal from "../../shared/components/UIElements/Modal.component";
 import Button from "../../shared/components/FormElements/Button.component";
@@ -13,9 +16,11 @@ const PlaceItem = ({
   coordinates,
   title,
   description,
-  creatorId,
-  address
+  address,
+  onDelete,
+  creatorId
 }) => {
+  const { error, sendRequest, clearError, isLoading } = useHttpClient();
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -31,11 +36,16 @@ const PlaceItem = ({
     setShowConfirmModal(false);
   };
 
-  const confirmDeleteHandler = () => {
-    console.log("deleting");
+  const confirmDeleteHandler = async () => {
+    setShowConfirmModal(false);
+    try {
+      await sendRequest(`http://localhost:5000/api/places/${id}`, "DELETE");
+      onDelete(id);
+    } catch (err) {}
   };
   return (
     <>
+      {error && <ErrorModal error={error} onClear={clearError} />}
       <Modal
         show={showMap}
         onCancel={closeMapHandler}
@@ -71,6 +81,7 @@ const PlaceItem = ({
       </Modal>
       <li>
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={imageURL} alt={title} />
           </div>
@@ -83,7 +94,7 @@ const PlaceItem = ({
             <Button inverse onClick={openMapHandler}>
               VIEW ON MAP
             </Button>
-            {auth.isLoggedIn && (
+            {auth.userId === creatorId && (
               <>
                 <Button to={`/places/${id}`}>EDIT</Button>
                 <Button danger onClick={showDeleteHandler}>

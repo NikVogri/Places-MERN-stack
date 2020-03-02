@@ -5,7 +5,7 @@ import PlaceItem from "./PlaceItem.component";
 import Card from "../../shared/components/UIElements/Card.component";
 import "./PlaceList.css";
 
-const PlaceList = ({ items }) => {
+const PlaceList = ({ items, onDeletePlace }) => {
   if (items.length === 0) {
     return (
       <div className="place-list center">
@@ -23,12 +23,13 @@ const PlaceList = ({ items }) => {
         <PlaceItem
           key={item.id}
           id={item.id}
-          imageURL={item.imageURL}
+          imageURL={item.image}
           title={item.title}
           description={item.description}
           address={item.address}
           creatorId={item.creator}
           coordinates={item.location}
+          onDelete={onDeletePlace}
         />
       ))}
     </ul>
