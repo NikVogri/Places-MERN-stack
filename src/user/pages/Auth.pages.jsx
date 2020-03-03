@@ -52,7 +52,7 @@ const Auth = () => {
             "Content-Type": "application/json"
           }
         );
-        auth.login(responseData.user.id);
+        auth.login(responseData.user.userId, responseData.user.token);
       } catch (err) {}
     } else {
       try {
@@ -67,7 +67,7 @@ const Auth = () => {
           "POST",
           formData
         );
-        auth.login(responseData.user.id);
+        auth.login(responseData.data.userId, responseData.data.token);
       } catch (err) {}
     }
   };
@@ -122,7 +122,12 @@ const Auth = () => {
             />
           )}
           {!showLogin && (
-            <ImageUpload center id="image" onInput={inputHandler} />
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputHandler}
+              errorText="Please provide an image"
+            />
           )}
           <Input
             id="email"

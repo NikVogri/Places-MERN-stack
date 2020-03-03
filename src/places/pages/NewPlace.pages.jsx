@@ -8,6 +8,7 @@ import { useHttpClient } from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/context/auth-context";
 import { useHistory } from "react-router-dom";
 
+import ImageUpload from "../../shared/components/FormElements/ImageUpload.component";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal.component";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner.component";
 import Button from "../../shared/components/FormElements/Button.component";
@@ -28,6 +29,10 @@ const NewPlace = () => {
       address: {
         value: "",
         isValid: false
+      },
+      image: {
+        value: "",
+        isValid: false
       }
     },
     false
@@ -36,22 +41,26 @@ const NewPlace = () => {
 
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
-  const { userId } = useContext(AuthContext);
+  const { userId, token } = useContext(AuthContext);
 
   const placeSubmitHandler = async event => {
     event.preventDefault();
     try {
-      await sendRequest(
+      const formData = new FormData();
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("creator", userId);
+      formData.append("image", formState.inputs.image.value);
+      const data = await sendRequest(
         "http://localhost:5000/api/places",
         "POST",
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value,
-          creator: userId
-        }),
-        { "Content-Type": "application/json" }
+        formData,
+        {
+          Authorization: `Bearer ${token}`
+        }
       );
+      console.log(data);
       history.push("/");
     } catch (err) {}
   };
@@ -62,6 +71,12 @@ const NewPlace = () => {
 
       <form className="place-form" onSubmit={placeSubmitHandler}>
         {isLoading && <LoadingSpinner asOverlay />}
+        <ImageUpload
+          center
+          id="image"
+          onInput={inputHandler}
+          errorText="Please provide an image"
+        />
         <Input
           id="title"
           element="input"
